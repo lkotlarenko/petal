@@ -20,4 +20,5 @@ cp LICENSE "$appdir/usr/share/licenses/petal/"
 cp -a packaging/licenses "$appdir/usr/share/licenses/petal/"
 ARCH=x86_64 APPIMAGE_EXTRACT_AND_RUN=1 "${APPIMAGETOOL:-appimagetool}" "$appdir" "$PWD/dist/Petal-$version-x86_64.AppImage"
 (cd dist && sha256sum "Petal-$version-x86_64.AppImage" > "Petal-$version-x86_64.AppImage.sha256")
+rm -rf -- "${stage:?}"
 printf 'Built dist/Petal-%s-x86_64.AppImage\n' "$version"

@@ -1,5 +1,4 @@
 """Cache correctness, cancellation and the bounded discovery reader pool."""
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import sqlite3
 import tempfile

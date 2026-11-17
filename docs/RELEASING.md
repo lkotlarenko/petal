@@ -31,7 +31,7 @@ PETAL_PYTHON=.venv/bin/python APPIMAGETOOL="$PWD/build/tools/appimagetool" ./scr
 PETAL_APPIMAGE=dist/Petal-0.3.0-x86_64.AppImage python3 scripts/smoke-appimage.py
 ```
 
-Unique `build-appimage.*` directories preserve staging/debug files; remove those directories manually when no longer needed. `dist/` holds the AppImage and checksum. Neither is tracked. The build recipe leaves system FFmpeg, FFprobe and GPU drivers outside the bundle. Dynamic Qt libraries and third-party notices can be inspected through `--appimage-extract`.
+Successful builds remove their unique `build-appimage.*` staging directory. Failed builds retain it for diagnosis; remove that directory manually once it is no longer needed. `dist/` holds the AppImage and checksum. Neither is tracked. The build recipe leaves system FFmpeg, FFprobe and GPU drivers outside the bundle. Dynamic Qt libraries and third-party notices can be inspected through `--appimage-extract`.
 
 A packaged smoke check cannot prove GPU compatibility. Run the application hardware check and representative sample comparisons on AMD hardware before using a release for a full library. See [test report](TEST_REPORT.md).
 

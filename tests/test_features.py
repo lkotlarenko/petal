@@ -67,7 +67,11 @@ class DropTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder); source=root/'猫'; source.mkdir(); (source/'nested').mkdir()
             first=source/'nested'/'one.mp4'; second=source/'nested'/'one.mov'
-            generate(first,160,90); second.write_bytes(first.read_bytes())
+            # FFV1-in-MP4 is unsupported by older distribution FFmpeg builds.
+            # Misnamed Matroska still tests content probing and name collisions.
+            fixture=source/'nested'/'fixture.mkv'
+            generate(fixture,160,90); fixture.rename(first)
+            second.write_bytes(first.read_bytes())
             (source/'loop').symlink_to(source,target_is_directory=True)
             namespaces={}
             jobs=discover_selection([first,source],root/'output',Runner(),namespaces)
