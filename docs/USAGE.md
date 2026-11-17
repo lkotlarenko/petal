@@ -40,6 +40,6 @@ For file moves and the warning-confirmed Trash action, see [Organizing originals
 
 **No scores:** your FFmpeg may lack libvmaf or the required model, or the clip may be too short. A missing score does not invalidate a successfully verified copy.
 
-**App will not open:** launch the AppImage from a terminal. Check system OpenGL/window libraries and file-picker portal. If FUSE is unavailable, use `APPIMAGE_EXTRACT_AND_RUN=1 ./Petal-<version>-x86_64.AppImage`.
+**App will not open:** launch the AppImage from a terminal. Check system OpenGL/window libraries and file-picker portal. X11 needs the `libxkbcommon-x11` runtime (`libxkbcommon-x11-0` on Ubuntu). If FUSE is unavailable, use `APPIMAGE_EXTRACT_AND_RUN=1 ./Petal-<version>-x86_64.AppImage`.
 
 **Interrupted move:** reopen/scan the same output with the same state directory. Keep journal and hold files until recovery completes. See the recovery guide before manually moving them.

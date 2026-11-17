@@ -24,7 +24,7 @@ jobs:
           rustup toolchain install stable --profile minimal --component rustfmt --component clippy --component rust-docs
           rustup default stable
           sudo apt-get update
-          sudo apt-get install -y ffmpeg libglib2.0-bin pkg-config libxkbcommon-dev libegl1-mesa-dev libfuse2t64 xvfb xauth jq desktop-file-utils
+          sudo apt-get install -y ffmpeg libglib2.0-bin pkg-config libxkbcommon-dev libegl1-mesa-dev libxkbcommon-x11-0 libgl1-mesa-dri libglx-mesa0 libfuse2t64 xvfb xauth jq desktop-file-utils
       - name: Choose automatic version
         id: version
         run: |

@@ -64,14 +64,14 @@ System requirements:
 
 - **FFmpeg and FFprobe** for reading, compressing and checking media.
 - A working **VA-API graphics driver** and access to a render device such as `/dev/dri/renderD128`.
-- Standard desktop OpenGL/window-system libraries and a file-picker portal.
+- Standard desktop OpenGL/window-system libraries and a file-picker portal. X11 sessions also need the `libxkbcommon-x11` runtime library.
 - **gio**, from GLib, for desktop Trash; `xdg-open` for opening files in other apps. If Trash is unsupported, Petal keeps the original and reports the problem. It never falls back to permanent deletion.
 - Optional **libvmaf** in FFmpeg for scene-quality scores. Missing scores do not prevent normal integrity checks.
 
 On Arch/CachyOS, install the system packages if they are missing:
 
 ```bash
-sudo pacman -S --needed ffmpeg mesa libva-utils glib2 xdg-utils
+sudo pacman -S --needed ffmpeg mesa libva-utils glib2 xdg-utils libxkbcommon-x11
 ```
 
 Use your desktop's existing portal backend for file pickers. For a menu/dock icon, keep the AppImage in a permanent location and use **Settings → Add AppImage to applications**.
