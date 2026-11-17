@@ -1,0 +1,66 @@
+name: AppImage release
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: petal-release
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Install build and test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libegl1 libopengl0 libxkbcommon0 libxcb-cursor0 libfuse2t64 desktop-file-utils
+          python -m pip install -r packaging/requirements.txt
+      - name: Choose automatic version
+        id: version
+        run: |
+          git fetch --tags origin
+          version=$(python scripts/release-version.py --write)
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+      - name: Test before packaging
+        run: ./scripts/test.sh
+      - name: Download and verify AppImage tool
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/fetch-appimagetool.py
+      - name: Build AppImage
+        env:
+          APPIMAGETOOL: ${{ github.workspace }}/build/tools/appimagetool
+        run: ./scripts/build-appimage.sh
+      - name: Test packaged application
+        env:
+          PETAL_APPIMAGE: dist/Petal-${{ steps.version.outputs.value }}-x86_64.AppImage
+        run: python scripts/smoke-appimage.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: Petal-${{ steps.version.outputs.value }}-x86_64
+          path: dist/Petal-*
+          if-no-files-found: error
+      - name: Publish release after all checks pass
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          tag="v$RELEASE_VERSION"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists; keeping its assets."
+          else
+            gh release create "$tag" --target "$GITHUB_SHA" --title "Petal $RELEASE_VERSION" --generate-notes dist/Petal-*
+          fi

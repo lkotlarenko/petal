@@ -1,0 +1,4 @@
+# Release toolchain. Update deliberately and validate the packaged application.
+PySide6==6.12.0
+pyinstaller==6.22.3
+pyinstaller-hooks-contrib==2026.10

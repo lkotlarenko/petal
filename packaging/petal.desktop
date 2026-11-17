@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Petal
+Comment=Careful GPU batch video compression
+Exec=petal
+Icon=petal
+Terminal=false
+Categories=AudioVideo;Video;
+StartupNotify=true
+StartupWMClass=petal
