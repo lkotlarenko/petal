@@ -1,6 +1,6 @@
 # Python 0.4 versus Rust 0.5
 
-Measured locally on 2026-11-17. The baseline is the actual 0.4.0 release AppImage and its source. The Rust package is a stripped, zstd-compressed native release build. Raw measurements are in [comparison-results.json](comparison-results.json).
+Measured locally on 2026-11-17. The baseline is the actual 0.4.0 release AppImage and its source. The Rust package is a stripped, zstd-compressed native release build. Raw measurements are in [comparison-results.json](validation/comparison-results.json).
 
 ## Download and runtime
 

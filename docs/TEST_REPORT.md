@@ -14,3 +14,5 @@ Checked locally on 2026-11-17. Results describe this tested build/host, not ever
 The test-only CPU encoder adapters let CI validate media verification without hardware; production video encoding remains VA-API. The actual cross-filesystem path was exercised locally because the workspace and temporary directory are on different devices. On CI hosts where those paths share a filesystem, that fixture exercises the same-filesystem route; simulated interrupted-copy recovery tests still cover journal handling.
 
 GIO tests trash only synthetic files with an isolated temporary data directory. No user media or real user Trash is a test target. Scene scores require libvmaf; the test is conditional when that optional filter is absent. GUI smoke startup does not establish every compositor, portal or accessibility behavior. See [UI review](UI_QA.md) and [measured comparison](COMPARISON.md).
+
+Recorded evidence: [Rust checks](validation/test-output.txt), [synthetic GPU batch](validation/gpu-smoke.txt), [comparison measurements](validation/comparison-results.json).
