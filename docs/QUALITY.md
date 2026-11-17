@@ -31,7 +31,7 @@ Encoding, integrity verification and optional quality analysis have separate rol
 
 The encoder can work on the next file while the previous output is verified. Only one additional encoded file can wait behind the active verifier. Verification remains ahead of publication: a partial output is never presented as complete. Pause finishes/drains current encode/verification work; existing quality analyses may finish. Stop/close cancels all active processes and removes unpublished partials. A quality analysis cancelled after publication leaves the already verified file intact.
 
-Full decode remains the default integrity mode. Uncheck **Full CPU decode** for metadata, full packet-timeline and sampled decode checks. Overlapping sample intervals merge, which avoids decoding short clips three times. Unknown durations escalate to full decoding. A new output below the savings threshold skips expensive verification immediately, because it will not be published.
+Full decode remains the default integrity mode. Uncheck **Thorough verification** for metadata, full packet-timeline and sampled decode checks. Overlapping sample intervals merge, which avoids decoding short clips three times. Unknown durations escalate to full decoding. A new output below the savings threshold skips expensive verification immediately, because it will not be published.
 
 Previously verified, unchanged outputs reuse their saved proof after fresh identity and metadata checks. A sampled proof upgrades once when strict verification is requested. Settings and quality reports use XDG storage and atomic, synchronized state updates. Logs include separate encoding and verification wall times; they do not claim a GPU speedup without host measurement.
 

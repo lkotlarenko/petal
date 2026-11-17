@@ -19,6 +19,7 @@ def main():
     from . import __version__
     parser.add_argument("--version", action="version", version=f"Petal {__version__}")
     parser.add_argument("--smoke-test", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--install-desktop", action="store_true", help="Add this AppImage and its icon to your application menu")
     commands = parser.add_subparsers(dest="command")
     check = commands.add_parser("doctor", help="Run real hardware encode/decode tests at the selected ceiling")
     check.add_argument("--device", default="/dev/dri/renderD128")
@@ -43,6 +44,12 @@ def main():
         cmd.add_argument("--no-auto-quality", action="store_true", help="Disable first-three VMAF spot checks")
         cmd.add_argument("--resolution", choices=tuple(RESOLUTIONS), default="1080p", help="Output ceiling, with orientation preserved and no upscaling")
     args = parser.parse_args()
+    if args.install_desktop:
+        from PySide6.QtWidgets import QApplication
+        from .icons import install_desktop
+        app = QApplication.instance() or QApplication([])
+        print(install_desktop())
+        return 0
     if args.smoke_test:
         from .gui import smoke
         return smoke()

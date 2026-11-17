@@ -58,7 +58,7 @@ The default profile values are **provisional starting points**, not a measured R
 - **Settings:** AV1 or H.265 VA-API, profile, render node, verification mode, minimum savings, original/Opus audio, and maximum-compatibility / strict / explicit-omission stream policies.
 - **Detailed log:** bounded on screen; rotating technical logs and the hardware report live in the XDG state directory.
 
-The destination contains **only worthwhile, verified compressions**. A skipped file is not copied to the destination. This is a compression tool, not a complete backup or library migration tool.
+Compression publishes **worthwhile, verified compressions**. Skipped files are not copied automatically. The batch report offers separate, explicit moves of skipped/failed originals into `skipped/` and `failed/`. This is not a complete backup tool.
 
 Unknown source durations use file-count progress and no ETA. Known durations weight aggregate progress. Current encoding progress, FPS and speed come from FFmpeg's structured `-progress` output. Full decode verification has its own progress bar, so it does not overwrite the current encoding display. The first three eligible new conversions receive automatic low-priority VMAF spot checks and a separate quality report. ETA is approximate encoding time plus an unestimated verification phase.
 
@@ -107,7 +107,7 @@ XDG defaults:
 ~/.local/state/petal/petal.log  (rotated)
 ```
 
-Filesystem full, permission, subprocess, verification and GPU failures appear on the affected job and in the log. Completed files are not exposed while encoding, and Petal never deletes, renames or overwrites a source.
+Filesystem full, permission, subprocess, verification and GPU failures appear on the affected job and in the log. Completed files are not exposed while encoding. Compression never deletes, renames or overwrites a source. The separate, explicitly confirmed organization action verifies a complete copy before removing a skipped/failed original; see [organization and recovery](ORGANIZING.md).
 
 ## CLI and tests
 
@@ -135,4 +135,4 @@ See [test report](TEST_REPORT.md) for what was actually run and [usage/troublesh
 
 VMAF checks the first three **new, successfully verified SDR conversions** with a known duration of at least two seconds. Long videos get three reproducibly jittered two-second windows from early/middle/late sections; short videos get one window. One low-priority analysis worker runs independently of encoding and verification. Results persist with the job record and appear under **Quality details**, with mean score, 10th percentile, worst scene and exact sample positions. Low scores suggest visual review; they do not replace integrity verification. See the [quality/performance guide](QUALITY.md) for model assumptions and thresholds.
 
-For quicker integrity checks, uncheck **Settings → Full CPU decode** or pass `--sampled-verification`. This retains metadata, complete packet-timeline and sampled decode checks, with less corruption coverage than full decode. Full mode remains the default, now overlapping GPU encoding. `--no-auto-quality` disables optional VMAF work. Normal batch processing remains local and keeps one GPU encoder at a time.
+For quicker integrity checks, uncheck **Settings → Thorough verification** or pass `--sampled-verification`. This retains metadata, complete packet-timeline and sampled decode checks, with less corruption coverage than full decode. Full mode remains the default, now overlapping GPU encoding. `--no-auto-quality` disables optional VMAF work. Normal batch processing remains local and keeps one GPU encoder at a time.

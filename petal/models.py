@@ -25,7 +25,7 @@ PROFILES = {
 }
 PROFILE_HELP = {
     "High Quality": "Retains more fine detail and texture; larger outputs.",
-    "Balanced": "Quality-oriented CQP; compare a sample before a large batch.",
+    "Balanced": "A balance of retained detail and smaller files.",
     "Maximum Savings": "More compression; fine texture and gradients may visibly degrade.",
 }
 
@@ -202,6 +202,9 @@ class Job:
     verify_seconds: float | None = None
     encoder_profile: str | None = None
     encoder_codec: str | None = None
+    relocated_to: Path | None = None
+    relocation_error: str = ""
+    output_root: Path | None = None
 
 
 def xdg_path(kind: str) -> Path:

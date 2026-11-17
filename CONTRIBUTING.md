@@ -23,3 +23,5 @@ bash -n launch.sh scripts/test.sh scripts/build-appimage.sh
 Use regression tests for meaningful failure modes. GPU fixtures must never become a production CPU-encoding fallback. The build toolchain pins direct dependencies; transitive packages and upstream AppImage runtime are not fully locked, so builds are not claimed byte-for-byte reproducible.
 
 Petal uses GPL-3.0-only. Contributions are provided under the same license. See [LICENSE](LICENSE) and [third-party notices](THIRD_PARTY.md).
+
+For library/report changes, run the native GUI tests and the history/relocation suites. File moves must retain no-clobber behavior, full-byte verification, directory durability and source-hold recovery; do not replace this protocol with `shutil.move` or a cross-device rename fallback. Screenshots must continue to use isolated demonstration data. See [UI QA](docs/UI_QA.md) and [organization protocol](docs/ORGANIZING.md).

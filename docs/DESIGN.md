@@ -74,3 +74,9 @@ Mixed local input discovery deduplicates canonical paths, reserves output names,
 `packaging/` holds the PyInstaller specification, launcher, desktop entry, dependency pins and license texts. `scripts/` holds local build, screenshot, version-selection and packaged-smoke tools. `.github/workflows/` orchestrates test and release jobs. Source version metadata has one authority in `petal/__init__.py`.
 
 Frozen media subprocesses re-enter Petal through a private child switch, establish parent-death/cancellation behavior and restore the original system library search path before executing host FFmpeg/FFprobe. This avoids treating the packaged executable as a Python interpreter and avoids leaking bundled Qt libraries into system tools. The hardware evidence signature includes source files shipped as data alongside the frozen modules.
+
+## Library, reports and relocation
+
+`history.py` stores advisory UI snapshots separately from engine verification state. Queued work and finished results survive restarts; a report is an independent snapshot, so retrying a row does not alter old totals. `library_ui.py` owns filtered Jobs/Finished views and explicit file actions. `report_ui.py` presents aggregate results and opt-in organization; `gui.py` continues to schedule background work and deliver Qt signals. `icons.py` handles rendered icon assets and explicit user-level desktop integration.
+
+`relocate.py` is separate from compression. It accepts only skipped/failed jobs and holds the output lock. It uses descriptor-relative non-symlink directory operations, a synced recovery journal, full-file source/copy checksums, non-replacing publication and a recoverable source hold. It copies across filesystems but never renames across them. Recovery restores held originals without replacing files and never automatically deletes originals. See [transfer/recovery protocol](ORGANIZING.md).

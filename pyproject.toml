@@ -26,4 +26,4 @@ Issues = "https://github.com/lkotlarenko/petal/issues"
 include = ["petal*"]
 
 [tool.setuptools.package-data]
-petal = ["*.svg"]
+petal = ["*.svg", "*.png"]

@@ -6,11 +6,11 @@ Choose a quality profile. Open Settings if you want HEVC, Opus, a different rend
 
 Inspect a comparison sample before a large batch. Select exactly one playable row and open Settings → Compare selected video samples. The three outputs contain the same central excerpt. Compare motion and detail visually; sizes and SSIM appear in the results dialog and detailed log. The sample bytes are not extrapolated into promised full-file savings.
 
-Press **Start compression**. Double-clicking does not start concurrent workers. Use Pause after current to let the current output finish safely, or Stop safely to cancel immediately and clean its temporary file. Closing the window also cancels work and waits asynchronously for process shutdown and cleanup.
+Press **Compress videos**. Double-clicking does not start concurrent workers. Use Pause after current to let the current output finish safely, or Stop safely to cancel immediately and clean its temporary file. Closing the window also cancels work and waits asynchronously for process shutdown and cleanup.
 
 The table shows original size, source/target geometry, codec, status, output size and savings. Hover a row for full source/destination paths and the job explanation. The queue bar uses durations where known, otherwise file count. Verification is a separate stage. Unknown timing produces an unknown ETA instead of a fabricated prediction.
 
-Restart, choose the same folders and scan again to reconstruct the queue. Start will validate matching recorded outputs instead of re-encoding them. Originals are always retained, including after success. For skipped files, no completed output is created.
+Restart, choose the same folders and scan again to reconstruct the queue. Start will validate matching recorded outputs instead of re-encoding them. Compression retains originals, including after success. Skipped files create no compressed output. Separately, the report can move skipped/failed originals after explicit confirmation; see [organizing files](ORGANIZING.md).
 
 ## Troubleshooting
 
@@ -60,7 +60,7 @@ The repeated `Unrecognized option color_transfer:v:0` error was a command-genera
 
 Full verification decodes the complete output on the CPU. It now runs alongside the next GPU encode, with its own progress bar, up to four video-decoder threads, reduced scheduling priority, and a bounded temporary-file backlog. The GPU encoder remains VA-API even if a source needs software decoding. When verification is slower than encoding, the queue applies backpressure rather than filling the disk with unchecked outputs.
 
-For a faster option, uncheck **Settings → Full CPU decode**. Fast mode still checks metadata and actual packet endpoints, plus beginning/middle/end decoded samples. It has lower full-file corruption coverage; unchanged files that were already verified reuse their saved proof. Files without enough byte savings are discarded before expensive verification.
+For a faster option, uncheck **Settings → Thorough verification**. Fast mode still checks metadata and actual packet endpoints, plus beginning/middle/end decoded samples. It has lower full-file corruption coverage; unchanged files that were already verified reuse their saved proof. Files without enough byte savings are discarded before expensive verification.
 
 The default quality guard analyzes the first three eligible new successes with Netflix VMAF, using a separate low-priority CPU worker. Open **Quality details** for mean, low-percentile and worst-scene scores and scene positions. A review suggestion remains visible even if a later file scores well. These checks compare a scaled/rotated reference at output resolution, so they measure encoding differences separately from your requested resolution reduction. Missing libvmaf/models are reported as unavailable and do not fail an otherwise verified conversion. See [quality details](QUALITY.md).
 
@@ -100,3 +100,13 @@ Keep your originals. Use **Open original** and **Open compressed** to inspect ol
 Folder scans use two metadata readers and cache unchanged metadata in `$XDG_CACHE_HOME/petal/discovery.sqlite3` (default `~/.cache/petal/discovery.sqlite3`). The detailed log reports elapsed time and cache hits/misses. Changed files or a changed FFprobe invalidate entries. Encoding and verification always read current media metadata independently of this cache. Cache errors are logged and direct probing continues.
 
 For a cold scan, close Petal and remove only its discovery cache directory or database and SQLite sidecars. This disposable cache is separate from settings and resume/verification state. Do not remove the state directory if you want recorded completion proof retained.
+
+## Batch reports and skipped/failed originals
+
+After a batch, use its report to review saved space and outcome counts. Jobs and Finished are separate persistent lists. Right-click rows for file actions or use **Remove selected** to remove entries without deleting media. **Move skipped originals** and **Move failed originals** are explicit, confirmed operations that fully verify copies before removing originals. See [organizing and recovery](ORGANIZING.md) and [usability QA](UI_QA.md).
+
+For an older collection, scan the original folders to recognize unchanged saved completions. Older skipped/error labels were not stored. Remaining Jobs may be explicitly skipped and organized through the report without encoding; do not assume every missing output was a failure.
+
+## AppImage icon and application menu
+
+Keep the AppImage in a permanent location and choose **Settings → Add AppImage to applications**, or run it with `--install-desktop`. This installs a user-level desktop entry and PNG icon; it does not require root. Repeat after moving or replacing the AppImage at a different path. AppImage file thumbnails depend on your file manager's thumbnail support, while menu/dock identification uses the installed `petal.desktop` entry.

@@ -38,3 +38,5 @@ A packaged smoke check cannot prove GPU compatibility. Run the application hardw
 Implementation references: [GitHub token permissions](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token), [PyInstaller runtime paths](https://pyinstaller.org/en/stable/runtime-information.html), [external system programs from frozen apps](https://pyinstaller.org/en/stable/common-issues-and-pitfalls.html#launching-external-programs-from-the-frozen-application), [appimagetool](https://github.com/AppImage/appimagetool).
 
 Fontconfig is deliberately a host dependency: its library reads the host's configuration and caches. The PyInstaller specification excludes the older build-host Fontconfig library so newer distribution configuration remains readable. Packaged GUI smoke tests reject Fontconfig warnings.
+
+Starting with 0.4, packaged checks also validate the root PNG/`.DirIcon`, standard hicolor icon sizes and isolated `--install-desktop` behavior. The main UI, finished history, report and relocation protocol are tested before packaging. Release media moves are never exercised on real user files during CI.

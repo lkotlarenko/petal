@@ -1,50 +1,31 @@
-# Verification report
+# Verification report · Petal 0.4.0
 
-Updated 2026-11-17 for Petal 0.3.x release preparation.
+Updated 2026-11-17.
 
-## Automated checks
+**116 passed, 1 GPU test skipped; 117 tests in 76.647 seconds.** Run: `./scripts/test.sh`. Full output: [test-output.txt](test-output.txt). Local runtime: Python 3.14 and PySide6 6.12.0; packaging: PyInstaller 6.22.3. Hosted releases use Python 3.12 on Ubuntu 24.04.
 
-**88 passed, 1 GPU test skipped; 89 tests in 70.977 seconds.** Run: `PETAL_PYTHON=/tmp/petal-build-venv/bin/python ./scripts/test.sh`.
+## New behavior tested
 
-The release toolchain uses PySide6 6.12.0 and PyInstaller 6.22.3. Local checks use Python 3.14; GitHub Actions uses Python 3.12 on Ubuntu 24.04. The full local test output is retained in [test-output.txt](test-output.txt).
+- Completion report opens after the batch worker has stopped; its counts, independent snapshot and relocated paths persist after restart.
+- Jobs and Finished filter and select the intended files, including a 550-row library and a search selecting its last row. Removing an entry leaves media untouched. Returning a stored result queues the selected file rather than unrelated files.
+- Pending work survives restart; interrupted live rows restore as unfinished work. Scans recognize unchanged recorded completions without encoding again.
+- The main interface fits 900×740 with usable table space and primary controls inside the window. Report links clear stale searches. Detailed engine configuration remains available.
+- A complete source/copy move preserves file bytes, relative path, original extension and mtime. The local cross-filesystem test passes using different workspace/temporary filesystems.
+- Collision, source changes, symlink/traversal, corrupted copy, disk-full, cancellation during final checks, replaced destination, source-directory failure immediately after rename and recovery conflicts retain/restore source data.
+- Simulated crashes after source hold and after source removal recover correctly; retries use only verified journaled copies. Recovery never replaces a new file at the original path.
+- Raster icons render and desktop integration quotes an AppImage path containing spaces and `%`. The package includes its root PNG, `.DirIcon`, six standard icon sizes and an explicit user-menu installer.
+- Failed discovery-cache initialization closes its SQLite connection. Hardware readiness correctly recognizes a configuration validated only at 10-bit.
 
-The suite covers command generation, geometry, discovery, filesystem safety, subprocess cancellation and parent-death cleanup; resolution policy and mixed dropped inputs; hardware/probe cache invalidation; native offscreen Qt controls; real FFmpeg encode/verify/publish/resume fixtures; controlled pipeline overlap/pause/stop; real VMAF scoring, downscaling and the 4K model; and release version selection. The actual-GPU test is skipped here because `/dev/dri` is unavailable.
+The prior compression tests also pass: real synthetic media, stream/color/geometry checks, VFR/timeline validation, no-clobber publication, interruption recovery, encode/verifier overlap, proof reuse and quality scheduling. Local FFmpeg/libvmaf tests include identity/blur discrimination, downscaling, real 4K-model operation and rejection of mismatched decoded geometry.
 
-## Regressions checked for this release
+## Packaged and visual checks
 
-- Decoded 1920×1082 frames with declared 1920×1080 dimensions fail verification before publication, including metadata-only resume checks.
-- An actual padded FFV1 fixture with simulated smaller container dimensions returns a geometry warning and no VMAF score.
-- A legacy quality report containing a numeric score plus a geometry warning hides that score in the quality dialog, queue and tooltip. Clearing the report list clears the displayed panel.
-- Real metadata scans reuse cached probe results, including video with an unknown extension; changed files invalidate the cache.
-- A SQLite write failure does not turn a successfully probed video into a failed job.
-- Two readers preserve discovery ordering and respect cancellation.
-- Release versions advance monotonically, respect an increased source floor and remain stable on reruns of a tagged commit.
+The final local AppImage passes `scripts/smoke-appimage.py`: extracted CLI/version, real FFprobe discovery through the frozen child trampoline, offscreen native GUI/icon rendering and clean shutdown, root/icon-theme PNG assets, isolated desktop-entry installation, and direct extract-and-run without FUSE. No Fontconfig warnings are accepted by the packaged check.
 
-## Packaged application
+Actual Qt screenshots with labeled demonstration data were visually inspected: [desktop](screenshots/petal.png), [compact](screenshots/compact.png), [report](screenshots/report.png), and [quality](screenshots/quality.png). Workflow YAML passes actionlint, the desktop entry passes desktop-file-validate, Python parses successfully, shell syntax passes and local documentation links resolve.
 
-A local x86_64 AppImage was built and checked with `scripts/smoke-appimage.py`. It passed:
+## Limits
 
-- Version output from the extracted application.
-- Real FFmpeg-generated fixture discovery through the frozen child-process entry point and system FFprobe.
-- Offscreen Qt window rendering, bundled icon availability and clean shutdown.
-- Direct AppImage extract-and-run without FUSE.
+No AMD render node is available here, so the actual-GPU test is skipped. The software encoder adapters exist only in tests and do not establish GPU throughput or driver compatibility. Native hardware checks remain mandatory on the machine doing compression. Ubuntu's FFmpeg may lack libvmaf; hosted VMAF tests explicitly skip where that optional filter is absent.
 
-A shutdown crash found during packaged testing was addressed by disposing the Qt window before interpreter teardown. The older PySide6 6.10.1 pin also crashed while connecting Qt signals under the local Python 3.14 interpreter; the final toolchain uses 6.12.0 and reruns native tests. The older failing build is not published.
-
-Workflow YAML passed `actionlint`; the desktop entry passed `desktop-file-validate`. Python compilation, shell syntax, package metadata/wheel construction and local documentation links were checked. Screenshots render actual Qt widgets with isolated XDG directories and explicit demonstration data; they do not expose user media or claim measured GPU results.
-
-## Discovery measurement
-
-A synthetic local collection of 30 small clips took **2.286 seconds cold** and **0.005 seconds warm** with 30 cache hits on the second scan. This establishes that repeat discovery avoids FFprobe calls. It does not establish speed on a large collection, a hard drive or a network filesystem.
-
-## Hardware and interpretation limits
-
-No AMD render device is available in this workspace. Software encoder adapters live only in tests and cannot establish VA-API quality, throughput or driver compatibility. Hardware encoding never falls back to a CPU encoder in production. Run hardware checks and representative visual sample comparisons on the target host.
-
-The reported 1082/1080 discrepancy is detected and rejected, but its particular GPU/driver cause is not established here. Existing outputs and originals are retained; quality analysis does not repair or replace encoded media. Initial decoded-frame checks do not prove constant dimensions throughout every possible stream. VMAF checks cover short samples, compare at output resolution and remain visual-review aids.
-
-Actual Wayland/X11 compositor integration, desktop scaling and GPU throughput are not manually validated by offscreen tests. CI's packaged smoke check runs before any release is published.
-
-## Published Ubuntu artifact check
-
-The v0.3.0 hosted workflows passed after correcting a test fixture that used FFV1-in-MP4, unsupported by Ubuntu's FFmpeg. The downloaded release checksum and packaged runtime checks passed locally. That cross-distribution check exposed warnings from Ubuntu's older bundled Fontconfig reading newer CachyOS font configuration. Removing the bundled Fontconfig and using the host library eliminated those warnings in the extracted official artifact. The 0.3.1 packaging recipe applies this fix, and packaged GUI checks reject Fontconfig warnings.
+Offscreen checks do not establish every real compositor, display scaling factor or screen-reader interaction. File-manager AppImage thumbnails depend on desktop support; package assets and explicit menu integration are verified. Full SHA-256 readback and fsync protect relocation against detected copy errors but cannot guarantee against every hardware failure or hostile concurrent modification. See [organization and recovery](ORGANIZING.md) and [usability QA](UI_QA.md).

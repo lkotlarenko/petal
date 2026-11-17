@@ -22,9 +22,13 @@ class ProbeCache:
         path.parent.mkdir(parents=True, exist_ok=True)
         self.lock = threading.Lock()
         self.db = sqlite3.connect(path, check_same_thread=False, timeout=5)
-        self.db.execute('PRAGMA journal_mode=WAL')
-        self.db.execute('PRAGMA synchronous=NORMAL')
-        self.db.execute('CREATE TABLE IF NOT EXISTS metadata (path TEXT PRIMARY KEY, identity TEXT, payload TEXT)')
+        try:
+            self.db.execute('PRAGMA journal_mode=WAL')
+            self.db.execute('PRAGMA synchronous=NORMAL')
+            self.db.execute('CREATE TABLE IF NOT EXISTS metadata (path TEXT PRIMARY KEY, identity TEXT, payload TEXT)')
+        except BaseException:
+            self.db.close()
+            raise
         executable = Path(shutil.which('ffprobe') or '/missing/ffprobe')
         try:
             stat = executable.stat()

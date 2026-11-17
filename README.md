@@ -27,9 +27,11 @@ Review your queue, keep your originals, and inspect measured picture quality.
 - Read metadata with two bounded readers and reuse a persistent discovery cache on repeat scans.
 - Inspect local VMAF spot checks with a large colored score, scene bars and links to both videos.
 - Pause, stop safely, retry failures and resume recorded completions.
-- Keep originals in place. Publish compressed files only after verification, with no replacement of existing outputs.
+- Compression keeps originals in place and never replaces existing outputs.
+- Review a colored batch report, then optionally move skipped/failed originals with full-byte verification.
+- Keep Jobs and Finished separate, with persistent results, search, filters and useful right-click actions.
 
-Petal's destination contains only worthwhile verified compressions. Skipped files are not copied. Use your own backup process for a complete library copy.
+Compression publishes worthwhile, verified outputs. Afterward, you can explicitly move skipped or failed originals into `skipped/` or `failed/` inside the output, preserving their relative paths. Use your own backup process for a complete library copy.
 
 ## Download and run
 
@@ -71,6 +73,18 @@ For an isolated installation, use Python 3.11+ with `python3 -m venv .venv` and 
 5. Start a small batch, inspect the results, then expand to your collection.
 
 Audio is copied by default. Maximum compatibility preserves supported tracks, represents timecode as metadata and converts supported text subtitles; strict copying and explicit omission are selectable. Unsupported HDR, interlacing and unusual formats are skipped with explanations. See [complete media and safety policy](docs/REFERENCE.md).
+
+## Review and organize a batch
+
+![Batch report](docs/screenshots/report.png)
+
+The report opens when a batch finishes and remains available through **Batch report**. It shows saved space and compressed, skipped and failed counts. Click a count to see those files in Finished. Choose **Move skipped originals** or **Move failed originals** to put them in `output/skipped/` or `output/failed/`, preserving their source-relative paths and original extensions. Moves require confirmation, refuse overwrites, and verify full SHA-256 checksums before removing originals.
+
+**Jobs** holds waiting or interrupted work; **Finished** holds results. Both persist across restarts. Add videos or drag folders, search and filter, right-click to open files/folders, inspect details, return files to Jobs, or remove list entries without deleting media. Right-click a table header for optional columns. Engine controls remain in Settings.
+
+For a collection processed by an older Petal version, scan the same folders to recognize unchanged recorded completions. Earlier skipped/error states were not saved, so remaining rows stay in Jobs. If you want to set those aside without encoding, select them, choose **Skip selected**, and use the report's move action. Petal does not guess which older files failed. [Organization, safety and recovery](docs/ORGANIZING.md).
+
+To add the AppImage to your application menu with its icon, move it to its permanent location and use **Settings → Add AppImage to applications**, or run `./Petal-<version>-x86_64.AppImage --install-desktop`. File-manager AppImage thumbnails also depend on desktop support; the package includes a raster icon, `.DirIcon` and standard icon-theme sizes.
 
 ## Picture quality at a glance
 
