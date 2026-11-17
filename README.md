@@ -1,41 +1,82 @@
 <div align="center">
 
-<img src="petal/petal.svg" width="88" alt="Petal flower icon">
+<img src="assets/petal.png" width="88" alt="Petal flower">
 
 # Petal
 
-**Careful GPU video compression for Linux.**
+**Make your videos smaller. Keep them on your computer.**
 
-A native desktop app for compressing video collections with AMD VA-API.
-Review your queue, keep your originals, and inspect measured picture quality.
-
-[Download AppImage](https://github.com/lkotlarenko/petal/releases/latest) · [Usage](docs/USAGE.md) · [Quality guide](docs/QUALITY.md) · [Contributing](CONTRIBUTING.md)
-
-[![Tests](https://github.com/lkotlarenko/petal/actions/workflows/ci.yml/badge.svg)](https://github.com/lkotlarenko/petal/actions/workflows/ci.yml)
-[![AppImage release](https://github.com/lkotlarenko/petal/actions/workflows/release.yml/badge.svg)](https://github.com/lkotlarenko/petal/actions/workflows/release.yml)
+[Download for Linux](https://github.com/lkotlarenko/petal/releases/latest) · [How to use it](docs/USAGE.md) · [What changed in Rust](docs/COMPARISON.md)
 
 </div>
 
-![Petal desktop interface](docs/screenshots/petal.png)
+Petal helps you save space in a large video collection. Choose your videos and a folder for the smaller copies, then let it work. It checks each new copy before keeping it.
 
-*Actual Qt interface with demonstration filenames and values; these are not benchmark results.*
+**Nothing is uploaded.** Your videos stay on your computer. Originals stay in place unless you explicitly choose to move them.
 
-## What Petal does
+![Petal desktop app](docs/screenshots/petal.png)
 
-- Batch AV1 or H.265 compression with one VA-API encoder; verification overlaps the next encode.
-- Drag in files or folders, preserve folder hierarchy, and choose an output resolution from 480p to 4K or Original.
-- Read metadata with two bounded readers and reuse a persistent discovery cache on repeat scans.
-- Inspect local VMAF spot checks with a large colored score, scene bars and links to both videos.
-- Pause, stop safely, retry failures and resume recorded completions.
-- Compression keeps originals in place and never replaces existing outputs.
-- Review a colored batch report, then optionally move skipped/failed originals with full-byte verification.
-- Keep Jobs and Finished separate, with persistent results, search, filters and useful right-click actions.
+*The screenshot uses demonstration filenames and numbers.*
 
-Compression publishes worthwhile, verified outputs. Afterward, you can explicitly move skipped or failed originals into `skipped/` or `failed/` inside the output, preserving their relative paths. Use your own backup process for a complete library copy.
+## Get started
 
-## Download and run
+1. Download the **AppImage** from [Releases](https://github.com/lkotlarenko/petal/releases/latest).
+2. In its file properties, allow it to run as a program, then open it.
+3. Choose a source folder and a separate output folder, or add videos to the app.
+4. Click **Find videos**, review the list, then **Compress videos**.
+5. Review the report when the batch finishes.
 
-Get the Linux x86_64 AppImage and its `.sha256` file from [Releases](https://github.com/lkotlarenko/petal/releases/latest):
+Start with a few videos and watch the results before processing a whole collection. **Balanced** is a useful starting point; **High Quality** keeps more detail, while **Maximum Savings** aims for smaller files. You can also choose the picture size. Smaller originals are not enlarged.
+
+Petal is for Linux computers with supported AMD graphics. Your system needs FFmpeg and a working graphics driver. If setup is needed, see the requirements at the end of this page. Petal checks graphics support before encoding.
+
+## After a batch
+
+![Batch report](docs/screenshots/report.png)
+
+The report shows how much smaller the successful copies are and how many files finished, were skipped, or need attention.
+
+- **Move skipped originals** puts them in `output/skipped/`, keeping their folders and names.
+- **Move failed originals** does the same in `output/failed/`.
+- **Move compressed originals to Trash** keeps the smaller copies and moves their successfully compressed originals to your desktop Trash. It requires a warning confirmation and checks that both files still match the successful result.
+
+Trash can be restored until you empty it. Moving originals to Trash does **not** immediately free their disk space, and Petal never empties Trash for you. If a file has changed or its compressed copy cannot be verified, its original is kept.
+
+Moving skipped/failed files on the same filesystem is now an atomic move: Petal does not copy and reread the whole video. Moves between filesystems use a checked copy before removing the source. Existing files are never overwritten. [File organization and recovery](docs/ORGANIZING.md).
+
+## Find things easily
+
+**Jobs** contains waiting or interrupted work. **Finished** contains results. Both lists and the last report survive restarts. Search, filter, select all shown rows, or right-click a file to open it, show its folder, inspect details or return it to Jobs. Removing a row removes it from the list, not from your disk.
+
+**Settings** contains the less common choices: video format, graphics device, verification, audio, extra tracks and sample comparisons. Picture-quality checks compare a few scenes and help you decide what to watch closely. Their scores are guides, not a promise about every frame. [Understanding picture checks](docs/QUALITY.md).
+
+## A smaller Rust app
+
+Petal is now written in Rust, including its interface and file handling. The AppImage no longer carries Python or Qt. The compression itself still uses your system's FFmpeg and graphics driver.
+
+See the [measured comparison](docs/COMPARISON.md) for package sizes, file-move and scan timings, and the limits of those measurements. The Rust rewrite does not make the graphics encoder itself magically faster.
+
+## Requirements and details
+
+Petal targets current Linux x86_64 desktops. Official AppImages are built on Ubuntu 24.04. AMD Mesa/VA-API is the supported graphics path; other GPU vendors are not validated.
+
+System requirements:
+
+- **FFmpeg and FFprobe** for reading, compressing and checking media.
+- A working **VA-API graphics driver** and access to a render device such as `/dev/dri/renderD128`.
+- Standard desktop OpenGL/window-system libraries and a file-picker portal.
+- **gio**, from GLib, for desktop Trash; `xdg-open` for opening files in other apps. If Trash is unsupported, Petal keeps the original and reports the problem. It never falls back to permanent deletion.
+- Optional **libvmaf** in FFmpeg for scene-quality scores. Missing scores do not prevent normal integrity checks.
+
+On Arch/CachyOS, install the system packages if they are missing:
+
+```bash
+sudo pacman -S --needed ffmpeg mesa libva-utils glib2 xdg-utils
+```
+
+Use your desktop's existing portal backend for file pickers. For a menu/dock icon, keep the AppImage in a permanent location and use **Settings → Add AppImage to applications**.
+
+Optional checksum and command-line launch:
 
 ```bash
 sha256sum -c Petal-<version>-x86_64.AppImage.sha256
@@ -43,74 +84,36 @@ chmod +x Petal-<version>-x86_64.AppImage
 ./Petal-<version>-x86_64.AppImage
 ```
 
-Release builds target Ubuntu 24.04 or newer compatible Linux distributions, including current Arch/CachyOS. Python and Qt are bundled. **FFmpeg, FFprobe, Fontconfig, VA-API drivers and access to `/dev/dri/renderD*` are system requirements.** AMD Mesa/radeonsi is the tested application target; other GPU vendors are not validated. Optional VMAF needs an FFmpeg build with `libvmaf` and its built-in models. Metric unavailability does not prevent integrity verification.
-
-On Arch/CachyOS:
+If FUSE is unavailable:
 
 ```bash
-sudo pacman -S --needed ffmpeg libva-utils mesa
+APPIMAGE_EXTRACT_AND_RUN=1 ./Petal-<version>-x86_64.AppImage
 ```
 
-If FUSE is unavailable, run with `APPIMAGE_EXTRACT_AND_RUN=1 ./Petal-<version>-x86_64.AppImage`. No system-wide installation is required. See [troubleshooting](docs/USAGE.md).
+AV1 and H.265 are the supported video formats. When AV1 fails the real output checks, Petal can use H.265 only after H.265 passes its own graphics check, and tells you which format was selected. Video encoding never silently switches to a CPU encoder. Unsupported HDR, interlaced video and unusual formats are skipped with explanations.
 
-## Run from source
+Audio is kept by default. The compatible-tracks setting preserves supported tracks, represents timecode as metadata and converts supported text subtitles. Strict preservation and explicit omission remain configurable. Full verification is the default; sampled verification checks fewer decoded sections but still checks full track timing.
+
+<details>
+<summary>Build, command line and maintenance</summary>
+
+Rust 1.88+ and the system dependencies above are required to build. Use the locked dependencies:
 
 ```bash
-git clone https://github.com/lkotlarenko/petal.git
-cd petal
-sudo pacman -S --needed python pyside6 ffmpeg libva-utils mesa qt6-wayland qt6-svg
-./launch.sh
+cargo build --release --locked
+cargo test --locked
+./target/release/petal --help
+./target/release/petal scan /path/to/Videos /path/to/Compressed
 ```
 
-For an isolated installation, use Python 3.11+ with `python3 -m venv .venv` and `.venv/bin/python -m pip install -r requirements.txt`. System media dependencies still apply. Optional application-menu entry: `python3 scripts/install-desktop.py`.
+`Cargo.toml` contains the version floor. Successful main-branch builds select the next version automatically, test Rust, build and test a Rust-only AppImage, then create a GitHub release with a checksum. Pull requests run tests without creating releases.
 
-## First compression
+- [User guide](docs/USAGE.md)
+- [Architecture](docs/DESIGN.md)
+- [Builds and releases](docs/RELEASING.md)
+- [Verification results](docs/TEST_REPORT.md)
+- [Python/Rust comparison](docs/COMPARISON.md)
+- [Contributing](CONTRIBUTING.md)
+- [GPLv3 license](LICENSE) · [Dependency notices](THIRD_PARTY.md)
 
-1. Let the hardware check finish. Petal validates actual encode/decode combinations before enabling them.
-2. Choose separate source and output directories, or drop local videos into the window.
-3. Scan and review the queue. Repeat scans reuse unchanged metadata; encoding always probes again.
-4. Use **Settings → Compare selected video samples** on representative content. The default quality profiles are starting points, not calibrated guarantees.
-5. Start a small batch, inspect the results, then expand to your collection.
-
-Audio is copied by default. Maximum compatibility preserves supported tracks, represents timecode as metadata and converts supported text subtitles; strict copying and explicit omission are selectable. Unsupported HDR, interlacing and unusual formats are skipped with explanations. See [complete media and safety policy](docs/REFERENCE.md).
-
-## Review and organize a batch
-
-![Batch report](docs/screenshots/report.png)
-
-The report opens when a batch finishes and remains available through **Batch report**. It shows saved space and compressed, skipped and failed counts. Click a count to see those files in Finished. Choose **Move skipped originals** or **Move failed originals** to put them in `output/skipped/` or `output/failed/`, preserving their source-relative paths and original extensions. Moves require confirmation, refuse overwrites, and verify full SHA-256 checksums before removing originals.
-
-**Jobs** holds waiting or interrupted work; **Finished** holds results. Both persist across restarts. Add videos or drag folders, search and filter, right-click to open files/folders, inspect details, return files to Jobs, or remove list entries without deleting media. Right-click a table header for optional columns. Engine controls remain in Settings.
-
-For a collection processed by an older Petal version, scan the same folders to recognize unchanged recorded completions. Earlier skipped/error states were not saved, so remaining rows stay in Jobs. If you want to set those aside without encoding, select them, choose **Skip selected**, and use the report's move action. Petal does not guess which older files failed. [Organization, safety and recovery](docs/ORGANIZING.md).
-
-To add the AppImage to your application menu with its icon, move it to its permanent location and use **Settings → Add AppImage to applications**, or run `./Petal-<version>-x86_64.AppImage --install-desktop`. File-manager AppImage thumbnails also depend on desktop support; the package includes a raster icon, `.DirIcon` and standard icon-theme sizes.
-
-## Picture quality at a glance
-
-![Picture quality dialog](docs/screenshots/quality.png)
-
-*Demonstration scores. VMAF compares short samples, not the entire file.*
-
-Mint means no concern in the checked scenes; amber or rose suggests visual comparison. Each scene bar includes its time and score. The score measures similarity at the output resolution, not the percentage of quality retained or the separate detail loss from downscaling.
-
-A decoded/container frame-size mismatch shows **Frame size needs attention**, hiding misleading scores. New mismatched outputs fail verification before publication. Existing outputs are retained for inspection. Read [quality interpretation and geometry troubleshooting](docs/QUALITY.md).
-
-## Development and releases
-
-```bash
-./scripts/test.sh
-./launch.sh --version
-./launch.sh scan /path/to/Videos /path/to/Compressed
-```
-
-Every successful `main` release workflow selects the next patch version automatically, runs tests, builds an AppImage, tests the packaged CLI and native GUI, and publishes a GitHub release with the AppImage and checksum. Pull requests run tests without publishing. No personal access token is required.
-
-- [Contributing and test setup](CONTRIBUTING.md)
-- [Architecture and tuning](docs/DESIGN.md)
-- [Release process and local packaging](docs/RELEASING.md)
-- [Verification evidence and limits](docs/TEST_REPORT.md)
-- [Full controls, CLI and safety reference](docs/REFERENCE.md)
-- [GPLv3 license](LICENSE) · [Third-party notices](THIRD_PARTY.md)
-
-GPU throughput and driver compatibility must be checked on the target host. Software fixtures and offscreen Qt tests do not establish hardware compatibility.
+</details>

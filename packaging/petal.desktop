@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Petal
-Comment=Careful GPU batch video compression
+Comment=Smaller videos, kept on your computer
 Exec=petal
 Icon=petal
 Terminal=false

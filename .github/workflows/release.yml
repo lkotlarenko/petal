@@ -1,4 +1,4 @@
-name: AppImage release
+name: Rust AppImage release
 on:
   push:
     branches: [main]
@@ -12,47 +12,46 @@ jobs:
   release:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 35
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
-        with:
-          python-version: '3.12'
-      - name: Install build and test dependencies
+      - name: Install Rust, media and desktop test tools
         run: |
+          rustup toolchain install stable --profile minimal --component rustfmt --component clippy --component rust-docs
+          rustup default stable
           sudo apt-get update
-          sudo apt-get install -y ffmpeg libfontconfig1 libegl1 libopengl0 libxkbcommon0 libxcb-cursor0 libfuse2t64 desktop-file-utils
-          python -m pip install -r packaging/requirements.txt
+          sudo apt-get install -y ffmpeg libglib2.0-bin pkg-config libxkbcommon-dev libegl1-mesa-dev libfuse2t64 xvfb xauth jq desktop-file-utils
       - name: Choose automatic version
         id: version
         run: |
           git fetch --tags origin
-          version=$(python scripts/release-version.py --write)
+          version=$(./scripts/release-version.sh --write)
           echo "value=$version" >> "$GITHUB_OUTPUT"
-      - name: Test before packaging
+      - name: Test Rust before packaging
         run: ./scripts/test.sh
       - name: Download and verify AppImage tool
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python scripts/fetch-appimagetool.py
-      - name: Build AppImage
+        run: ./scripts/fetch-appimagetool.sh
+      - name: Build Rust-only AppImage
         env:
           APPIMAGETOOL: ${{ github.workspace }}/build/tools/appimagetool
         run: ./scripts/build-appimage.sh
-      - name: Test packaged application
+      - name: Check packaged Rust app
         env:
-          PETAL_APPIMAGE: dist/Petal-${{ steps.version.outputs.value }}-x86_64.AppImage
-        run: python scripts/smoke-appimage.py
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          WINIT_UNIX_BACKEND: x11
+        run: xvfb-run -a ./scripts/test-appimage.sh dist/Petal-${{ steps.version.outputs.value }}-x86_64.AppImage
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: Petal-${{ steps.version.outputs.value }}-x86_64
+          name: Petal-${{ steps.version.outputs.value }}-Rust-x86_64
           path: dist/Petal-*
           if-no-files-found: error
-      - name: Publish release after all checks pass
+      - name: Create GitHub release after checks pass
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -62,5 +61,5 @@ jobs:
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Release $tag already exists; keeping its assets."
           else
-            gh release create "$tag" --target "$GITHUB_SHA" --title "Petal $RELEASE_VERSION" --generate-notes dist/Petal-*
+            gh release create "$tag" --target "$GITHUB_SHA" --title "Petal $RELEASE_VERSION · Rust" --generate-notes --notes-file packaging/release-notes.md dist/Petal-*
           fi

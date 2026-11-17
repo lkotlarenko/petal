@@ -1,46 +1,37 @@
-# Reports, lists and original-file organization
+# Organizing originals
 
-Compression still leaves every original in place. Organization is a separate operation, available only while compression is idle, and runs only after you confirm a move.
+Compression keeps originals. The batch report offers separate actions after processing is idle. Each move requires confirmation; Trash has a specific warning.
 
 ## Report and lists
 
-A report opens when a batch completes or stops safely. **Batch report** reopens it later, including after a restart. Saved space counts verified compressed files; moving an unchanged original is not counted as compression savings. Counts include successful, skipped and failed results, with unfinished files reported separately. Clicking a count opens the matching Finished filter and clears any older search.
+The report shows compressed, skipped, failed and unfinished counts, plus the bytes saved by successful smaller copies. Moving an unchanged original is not counted as compression savings. Clicking a result count filters Finished. The latest report and Jobs/Finished lists survive restart.
 
-**Jobs** contains waiting/interrupted work. **Finished** contains compressed, skipped and failed results. Search both lists by filename, folder, status or explanation. Add files through **Add videos**, choose a source folder or drop local folders/files. Select rows and use **Remove selected**, or the right-click menu, to remove list entries without deleting media. Removing a row does not rewrite the historical batch report.
+Removing a row removes it from the list only. Returning a result to Jobs does not delete either file or rewrite historical totals. Right-click a row to open files, show a folder, copy a path, inspect details/quality, requeue or organize eligible originals.
 
-Right-click rows to open the original or compressed file, show the original folder, copy its path, inspect details, return selected files to Jobs, move eligible originals or remove list entries. A relocated original opens from its new location. Returned results remain unchanged on disk; the engine still refuses to overwrite an existing compressed destination. Right-click headers to show optional columns, including source codec.
+## Skipped and failed files
 
-Results are the latest stored entry for each original path, rather than an unlimited archive of every encoding attempt. A report is a separate snapshot and does not change when you queue a file again. Interrupted encoding/verifying rows restore as unfinished work. Source/output changes still require a fresh scan where the queue no longer matches the selected folders.
+**Move skipped originals** sends `Videos/series/clip.mp4` to `Output/skipped/series/clip.mp4`. Failed files use `Output/failed/…`. Relative source folders and mixed-input namespaces are retained. Existing destination files are never replaced. The context menu can move selected eligible rows instead of the whole report.
 
-## Move skipped or failed originals
+On the **same filesystem**, Petal uses an atomic rename with no replacement. It does not copy/reread the entire video. The inode and file bytes remain the same. Source identity checks, a durable journal and directory synchronization protect the operation.
 
-1. Open the report after processing. Inspect skipped/error explanations if needed.
-2. Choose **Move skipped originals** or **Move failed originals**. The confirmation gives the exact destination root and number of originals.
-3. Leave Petal open while it copies and verifies. Progress names each stage. **Stop moving safely** cancels remaining work and retains/restores the current source before removal.
-4. Review Finished for moved locations or a move issue. A collision or changed file leaves the original in place. The context menu can organize selected rows instead of the whole report.
+**Between filesystems**, Petal copies into a private file, calculates a full source checksum, syncs the copy and verifies its contents. It keeps the destination without replacement, holds the original under a private name, rechecks source/destination hashes and identities, then removes the held source. A changed file, read error, collision or cancellation retains/restores the original. Basic timestamps are preserved; ownership, ACLs and extended attributes are not guaranteed across filesystems.
 
-For source `Videos/series/clip.mp4`, the skipped original goes to `Output/skipped/series/clip.mp4`, retaining its bytes and extension. Folder-drop namespaces remain part of the relative path. Failed originals use `Output/failed/…`. Existing destinations, including symlinks, are never replaced. Mixed selections from different output roots must be organized separately. Completed originals are not eligible for these move actions.
+These checks handle ordinary failures and concurrent changes; they cannot guarantee against every hardware/filesystem failure. Avoid editing files during organization and keep backups of irreplaceable media.
 
-## Transfer protocol
+## Successfully compressed originals
 
-The mover holds the output lock so it cannot overlap another Petal operation on that output. It opens source/output directories without traversing symlink components, checks available source identity against the job, and rejects path traversal and inputs inside the output tree.
+**Move compressed originals to Trash** is on the report. Its warning explains that smaller copies are kept and originals go to desktop Trash. Only successful results with unchanged originals and outputs are eligible. Petal checks the successful record, requires full verification and compares full-file source/output SHA-256 hashes before asking GIO to trash the original.
 
-It copies to a private, journaled file on the destination filesystem, handles short writes, preserves basic mode and timestamps, syncs the copy, rereads it and compares full SHA-256 checksums against the source. Publication uses a no-replacement hard link in the output directory. The copy and directory entry are made durable before source removal is considered.
-
-The source is briefly renamed to a unique hold name in its own directory. Its identity and full checksum are checked again, and the published copy is reread immediately before removal. Changed source/copy identities, read errors or cancellation restore/retain the original. Source removal and both directory states are synced; the journal records completion. This also supports moves between filesystems: only the verified copy crosses devices, while each rename/link stays on its own filesystem.
-
-These checks detect ordinary copy errors and concurrent changes; no software can guarantee against all failing hardware, hostile concurrent modifications or filesystems that misreport durability. Do not edit files during relocation. This verifies byte integrity, not whether an already-failed original was a playable video. ACLs, ownership and extended attributes are not guaranteed to transfer between filesystems. Keep backups of irreplaceable media.
+If the result is old or was only sample-verified, Petal requires a successful full verification before eligibility is upgraded. Missing, modified or unverifiable files keep their originals. If GIO/Trash fails, the original is retained and the error is reported. Petal never substitutes permanent deletion and never empties Trash. Space is not actually reclaimed while originals remain in Trash.
 
 ## Recovery
 
-The XDG state directory contains `history.json` and `relocations-<output-hash>.json`, alongside existing verification state. Move journals name exact temporary/hold files and checksum proofs. Do not delete them to clear a list.
+Keep the state directory and journals. Native library/proof/move state lives under `$XDG_STATE_HOME/petal` (normally `~/.local/state/petal`). Move journals are `native-moves-<hash>.json`; active-output journals are `native-active-<uuid>.json`.
 
-On startup for a configured output, on scanning that output and before another move, Petal examines its journal. A held original is restored to its original name without replacing a newly created file. If source removal completed before its final journal update, the durable destination is verified and recognized. Recovery never automatically deletes an original. A verified published copy may remain alongside a retained source after cancellation; retrying the move rechecks the journaled copy before finishing.
+On scanning or moving the same output, registered recovery records are examined under the output lock. A held original is restored without replacing a newly created file. Already completed moves can be recognized from destination identity/hash. Recovery never automatically deletes an original. A verified copy can remain beside a retained source after cancellation; retry rechecks it before finishing.
 
-An interrupted destination copy may use `.petal-<uuid>.move-copy`; a held original uses `.petal-<uuid>.move-source`. Do not remove a source hold manually. If recovery encounters a changed file, a new file at the original path, unavailable directories or an unreadable journal, it retains files and reports the issue. Inspect the log and preserve both paths until you have compared them.
+Only exact registered temporary paths are cleanup candidates. Unknown similarly named files are left alone. If recovery reports a collision or changed file, retain both paths and inspect the log. Do not delete `.petal-*` source holds or journals just to clear the UI.
 
-## Collections processed before 0.4
+## Older collections
 
-Scan the same source/output folders with the same state directory. Unchanged recorded completed outputs appear in Finished; this displays their recorded result, rather than creating a fresh integrity proof. Returning a file to Jobs uses the engine's current checks before reusing any output.
-
-Older versions did not persist skipped/error results. Petal therefore cannot reliably reconstruct those labels from a missing output. Remaining originals stay in Jobs. To organize them without another encode, explicitly select the desired rows and **Skip selected**, then use **Batch report → Move skipped originals**. Files known to have errored earlier can be inspected through their old logs; Petal will not fabricate an error classification.
+The Rust app can import 0.4 settings/history and recognize unchanged completion records. Older versions that did not save skipped/error labels cannot reconstruct them reliably. Explicitly select remaining Jobs and choose **Skip selected** to organize them without encoding. Petal does not invent an error classification from the absence of an output.

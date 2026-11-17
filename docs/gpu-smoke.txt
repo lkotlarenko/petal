@@ -1,4 +1,35 @@
-[VAAPI @ 0x55eac21f4c40] No VA display found for device /dev/dri/renderD128.
-Device creation failed: -22.
-Failed to set value 'vaapi=petal:/dev/dri/renderD128' for option 'init_hw_device': Invalid argument
-Error parsing global options: Invalid argument
+Checking hevc_vaapi / High Quality / 8-bit
+Checking hevc_vaapi / High Quality / 10-bit
+{8, 10}
+Checking hevc_vaapi / Maximum Savings / 8-bit
+Checking hevc_vaapi / Maximum Savings / 10-bit
+{8, 10}
+Found 3 videos; 0 unchanged files used cached details
+Checking av1_vaapi / Balanced / 8-bit
+8-bit check: Decoded picture size differs from its stored size; original kept
+Checking av1_vaapi / Balanced / 10-bit
+10-bit check: Decoded picture size differs from its stored size; original kept
+AV1 did not pass its output checks: This compression setting did not pass its hardware check. Try H.265 or inspect the log. Checking H.265 instead.
+Checking hevc_vaapi / Balanced / 8-bit
+Checking hevc_vaapi / Balanced / 10-bit
+Using checked H.265: AV1 did not pass the graphics-driver frame checks.
+Encoding: nested/1.mkv:
+Using software decoding for nested/1.mkv. Compression still uses the graphics card
+Verifying: nested/1.mkv: Checking the compressed copy
+Encoding: nested/2.mkv:
+Completed: nested/1.mkv: Checked and saved safely
+Verifying: nested/2.mkv: Checking the compressed copy
+Encoding: nested/3.mkv:
+Completed: nested/2.mkv: Checked and saved safely
+Verifying: nested/3.mkv: Checking the compressed copy
+Completed: nested/3.mkv: Checked and saved safely
+Found 3 videos; 3 unchanged files used cached details
+Completed: nested/1.mkv: Previously checked compressed copy
+Completed: nested/2.mkv: Previously checked compressed copy
+Completed: nested/3.mkv: Previously checked compressed copy
+/tmp/petal-native-e2e/source/nested/1.mkv: OK
+/tmp/petal-native-e2e/source/nested/2.mkv: OK
+/tmp/petal-native-e2e/source/nested/3.mkv: OK
+/tmp/petal-native-e2e/output/nested/3.mkv
+/tmp/petal-native-e2e/output/nested/2.mkv
+/tmp/petal-native-e2e/output/nested/1.mkv

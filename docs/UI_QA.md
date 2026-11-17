@@ -1,11 +1,9 @@
-# Usability and QA pass · 0.4
+# Desktop review
 
-The normal path is add/choose → select output/profile → compress → review → optionally organize. Codecs, GPU device, verification, audio and stream policy remain configurable in Settings. Technical logs and full quality diagnostics remain available.
+The 0.5 interface is native egui/OpenGL. Current screenshots are captured from the Rust binary using demonstration filenames/numbers, not private media. They show the Finished list and report.
 
-Native Qt checks cover 900×740 compact layout, usable table space, primary controls within the window, Jobs/Finished filtering, correct selection after filtering a 550-row library, search reset from report links, remove-without-delete behavior, returning a selected historical result without queuing unselected files, report presentation after the worker stops, persistent queued/history/report data, independent report snapshots, explicit move confirmation and restored moved locations.
+Reviewed: readable full folder paths, profile/size controls, Jobs/Finished separation, search/filter/selection, right-click actions, colored statuses, report totals, confirmation text, advanced Settings, icon assets and safe shutdown. The report's Trash action names originals and explains that smaller copies remain. Empty/search states and single-video button wording are handled.
 
-Actual offscreen widgets are rendered in [desktop](screenshots/petal.png), [compact layout](screenshots/compact.png), [batch report](screenshots/report.png) and [quality details](screenshots/quality.png) screenshots with demonstration data. Idle encode/verifier bars are hidden. Empty lists explain the next action. Main controls use plain language; optional columns and file details retain technical information.
+Automated package smoke tests cover launching and closing the actual native GUI, menu integration and six AppImage icon sizes. Rust filesystem/media tests cover the operations behind controls. A startup smoke test is not a complete interactive accessibility or every-compositor certification. Portal appearance and desktop Trash availability depend on the host.
 
-Safety tests inject corruption, destination collisions, disk-full errors, changed sources, cancellation during final checks, an ordinary error immediately after source rename, simulated crashes after hold/removal, symlink/path traversal attempts, destination replacement during final verification and recovery conflicts. A local test exercises different source/output filesystems when available. The existing compression/timeline/publication, VMAF and pipeline tests also run.
-
-Packaged checks exercise real media discovery, GUI rendering and shutdown, raster icon resources, `.DirIcon`, standard icon sizes, isolated desktop-entry installation and extract-and-run without FUSE. Real desktop compositors, screen readers, every scaling factor and actual GPU throughput are not established by offscreen tests; hardware checks remain required on the target host.
+Before each release, also check: narrow-window scrolling, keyboard focus/tab order, long/Unicode paths, many rows, active stop/close, unavailable device/portal, report reopen after restart and selection actions while idle. Keep the UI and these statements aligned with actual checks; never infer driver correctness from a demo screenshot.

@@ -1,0 +1,28 @@
+{
+  "method": "same-filesystem synthetic fixtures; elapsed wall time; warm OS page cache; setup and final SHA checks excluded; Rust includes CLI startup",
+  "move_128_MiB_seconds": {
+    "python": [
+      0.835050344991032,
+      0.8198099650326185,
+      0.7959030679776333
+    ],
+    "rust": [
+      0.02186395099852234,
+      0.028274378972128034,
+      0.02895618899492547
+    ]
+  },
+  "scan_30_files_cold_warm_seconds": {
+    "python": [
+      2.554268518986646,
+      0.0086803610320203
+    ],
+    "rust": [
+      0.7343348040012643,
+      0.004093374009244144
+    ]
+  },
+  "old_appimage_bytes": 77535736,
+  "rust_executable_bytes": 7602688,
+  "rust_appimage_bytes": 4430328
+}
