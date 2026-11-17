@@ -13,7 +13,7 @@ Petal is a native Rust Linux application. FFmpeg and FFprobe remain separate sys
 | `src/media.rs` | FFmpeg arguments, track/geometry/color/timing verification and VMAF |
 | `src/files.rs` | Locks, synchronized state, safe moves, recovery and desktop Trash |
 | `src/process.rs` | Subprocess pipes, timeouts, pause/cancellation and process-group cleanup |
-| `tests-rust/native.rs` | Synthetic media and real filesystem regression tests |
+| `tests/native.rs` | Synthetic media and real filesystem regression tests |
 | `assets/` | App icon source and raster asset |
 | `packaging/` | AppRun, desktop entry and release notes |
 | `scripts/` | Shell build, validation, version and packaging tools |
