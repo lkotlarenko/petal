@@ -41,7 +41,7 @@ chmod +x Petal-<version>-x86_64.AppImage
 ./Petal-<version>-x86_64.AppImage
 ```
 
-Release builds target Ubuntu 24.04 or newer compatible Linux distributions, including current Arch/CachyOS. Python and Qt are bundled. **FFmpeg, FFprobe, VA-API drivers and access to `/dev/dri/renderD*` are system requirements.** AMD Mesa/radeonsi is the tested application target; other GPU vendors are not validated. Optional VMAF needs an FFmpeg build with `libvmaf` and its built-in models. Metric unavailability does not prevent integrity verification.
+Release builds target Ubuntu 24.04 or newer compatible Linux distributions, including current Arch/CachyOS. Python and Qt are bundled. **FFmpeg, FFprobe, Fontconfig, VA-API drivers and access to `/dev/dri/renderD*` are system requirements.** AMD Mesa/radeonsi is the tested application target; other GPU vendors are not validated. Optional VMAF needs an FFmpeg build with `libvmaf` and its built-in models. Metric unavailability does not prevent integrity verification.
 
 On Arch/CachyOS:
 

@@ -14,7 +14,11 @@ with tempfile.TemporaryDirectory(prefix='petal-package-test-') as folder:
     env = dict(os.environ, QT_QPA_PLATFORM='offscreen', XDG_CONFIG_HOME=str(root/'config'),
                XDG_STATE_HOME=str(root/'state'), XDG_CACHE_HOME=str(root/'cache'))
     def run(*args):
-        return subprocess.check_output([str(launcher), *args], env=env, text=True, timeout=60)
+        result = subprocess.run([str(launcher), *args], env=env, text=True,
+                                capture_output=True, check=True, timeout=60)
+        if 'Fontconfig warning:' in result.stderr:
+            raise RuntimeError(result.stderr)
+        return result.stdout
     print(run('--version').strip())
     source = root / 'source'; source.mkdir()
     subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-f', 'lavfi', '-i',

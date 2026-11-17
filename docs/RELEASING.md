@@ -36,3 +36,5 @@ Successful builds remove their unique `build-appimage.*` staging directory. Fail
 A packaged smoke check cannot prove GPU compatibility. Run the application hardware check and representative sample comparisons on AMD hardware before using a release for a full library. See [test report](TEST_REPORT.md).
 
 Implementation references: [GitHub token permissions](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token), [PyInstaller runtime paths](https://pyinstaller.org/en/stable/runtime-information.html), [external system programs from frozen apps](https://pyinstaller.org/en/stable/common-issues-and-pitfalls.html#launching-external-programs-from-the-frozen-application), [appimagetool](https://github.com/AppImage/appimagetool).
+
+Fontconfig is deliberately a host dependency: its library reads the host's configuration and caches. The PyInstaller specification excludes the older build-host Fontconfig library so newer distribution configuration remains readable. Packaged GUI smoke tests reject Fontconfig warnings.

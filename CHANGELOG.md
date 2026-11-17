@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+- Use system Fontconfig in the AppImage to support newer Arch/CachyOS font configuration and avoid bundling an incompatible older configuration reader. Packaged GUI checks now reject Fontconfig warnings.
+
 ## 0.3.0
 
 - Introduce readable picture-quality details with colored scores, per-scene bars, exact timestamps, player shortcuts and expandable diagnostics.

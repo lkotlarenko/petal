@@ -1,6 +1,6 @@
 # Verification report
 
-Updated 2026-11-17 for Petal 0.3.0 release preparation.
+Updated 2026-11-17 for Petal 0.3.x release preparation.
 
 ## Automated checks
 
@@ -44,3 +44,7 @@ No AMD render device is available in this workspace. Software encoder adapters l
 The reported 1082/1080 discrepancy is detected and rejected, but its particular GPU/driver cause is not established here. Existing outputs and originals are retained; quality analysis does not repair or replace encoded media. Initial decoded-frame checks do not prove constant dimensions throughout every possible stream. VMAF checks cover short samples, compare at output resolution and remain visual-review aids.
 
 Actual Wayland/X11 compositor integration, desktop scaling and GPU throughput are not manually validated by offscreen tests. CI's packaged smoke check runs before any release is published.
+
+## Published Ubuntu artifact check
+
+The v0.3.0 hosted workflows passed after correcting a test fixture that used FFV1-in-MP4, unsupported by Ubuntu's FFmpeg. The downloaded release checksum and packaged runtime checks passed locally. That cross-distribution check exposed warnings from Ubuntu's older bundled Fontconfig reading newer CachyOS font configuration. Removing the bundled Fontconfig and using the host library eliminated those warnings in the extracted official artifact. The 0.3.1 packaging recipe applies this fix, and packaged GUI checks reject Fontconfig warnings.
