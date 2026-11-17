@@ -8,6 +8,7 @@
 - Used atomic no-replacement moves on the same filesystem. Cross-filesystem moves retain verified-copy recovery.
 - Kept Jobs/Finished, saved reports, relative-folder organization, advanced media settings, hardware-only encoding and integrity checks.
 - Added checked H.265 fallback when AV1 fails real output geometry checks.
+- Cleaned registered incomplete move copies during crash recovery while retaining originals and unknown files.
 - Added native AppImage icons, Rust CI, automatic version/release packaging and isolated artifact checks.
 - Documented measured size/performance changes and interface differences in [Comparison](docs/COMPARISON.md).
 

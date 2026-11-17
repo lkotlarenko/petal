@@ -1,7 +1,7 @@
     Checking petal v0.5.0 (/home/elly/Projects/petal)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.77s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.76s
    Compiling petal v0.5.0 (/home/elly/Projects/petal)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.25s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.07s
      Running unittests src/lib.rs (/tmp/petal-rust-target/debug/deps/petal-e46b2d30f3842d24)
 
 running 0 tests
@@ -16,32 +16,33 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 
      Running tests/native.rs (/tmp/petal-rust-target/debug/deps/native-953f6b61504044ae)
 
-running 26 tests
+running 27 tests
 test legacy_fingerprint_format_compatible ... ok
-test nested_roots_and_symlink_sources_are_rejected ... ok
 test completed_originals_cannot_use_skipped_move ... ok
-test output_lock_excludes_second_writer ... ok
-test no_clobber_output_keeps_temporary ... ok
 test changed_original_is_not_moved ... ok
+test no_clobber_output_keeps_temporary ... ok
+test output_lock_excludes_second_writer ... ok
+test nested_roots_and_symlink_sources_are_rejected ... ok
 test interrupted_atomic_move_is_reconciled_without_touching_bytes ... ok
+test collisions_keep_both_original_and_existing_destination ... ok
 test cancellation_keeps_source ... ok
 test safe_dimensions_profiles_and_portrait ... ok
-test collisions_keep_both_original_and_existing_destination ... ok
 test recovery_collision_preserves_new_file_and_held_original ... ok
+test interrupted_incomplete_copy_is_cleaned_without_touching_original_or_unknown_files ... ok
 test same_filesystem_move_retains_inode_and_never_copies_bytes ... ok
 test trash_requires_proof_and_never_touches_compressed_copy ... ok
-test traversal_and_symlink_output_are_rejected ... ok
-test unsupported_hdr_and_track_policy ... ok
 test interrupted_cross_copy_restores_source_then_retries_verified_copy ... ok
-test cross_filesystem_copy_is_verified ... ok
+test unsupported_hdr_and_track_policy ... ok
+test traversal_and_symlink_output_are_rejected ... ok
 test hardware_requires_a_real_device ... ok
 test scan_cache_names_and_existing_proofs ... ok
 test cancellation_kills_the_whole_media_process_group ... ok
 test library_roundtrip_550_rows_preserves_reports ... ok
+test cross_filesystem_copy_is_verified ... ok
 test decoded_geometry_mismatch_is_rejected ... ok
 test real_vmaf_identity_when_available ... ok
 test trash_rejects_changed_middle_bytes_even_with_matching_fast_fingerprint ... ok
 test real_encode_verify_both_formats_and_truncation ... ok
 test real_audio_subtitle_timecode_and_color_survive ... ok
 
-test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.93s
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.91s

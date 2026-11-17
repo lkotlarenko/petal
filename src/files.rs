@@ -291,6 +291,7 @@ impl Mover {
     pub fn recover(&mut self, c: &Control) -> Result<()> {
         let mut dirty = false;
         for r in self.records.values_mut() {
+            c.check()?;
             if r.phase == "done" {
                 continue;
             }
@@ -304,6 +305,26 @@ impl Mover {
                         .starts_with(".petal-"),
                 "Unsafe recovery record"
             );
+            if fs::symlink_metadata(&r.temporary).is_ok() {
+                let name = r
+                    .temporary
+                    .file_name()
+                    .unwrap_or_default()
+                    .to_string_lossy();
+                ensure!(
+                    r.temporary.parent() == r.destination.parent()
+                        && name.starts_with(".petal-")
+                        && name.ends_with(".move-copy"),
+                    "Unsafe temporary copy record"
+                );
+                let _parent = parent(&r.temporary, false)?;
+                ensure!(
+                    fs::symlink_metadata(&r.temporary)?.is_file(),
+                    "Temporary copy changed; retained"
+                );
+                fs::remove_file(&r.temporary)?;
+                sync_dir(r.temporary.parent().unwrap())?;
+            }
             if r.same_device && !r.source.exists() && r.destination.exists() {
                 ensure!(
                     identity(&fs::symlink_metadata(&r.destination)?) == r.original,

@@ -726,3 +726,37 @@ fn recovery_collision_preserves_new_file_and_held_original() -> Result<()> {
     assert_eq!(fs::read(&hold)?, vec![17_u8; 100000]);
     Ok(())
 }
+
+#[test]
+fn interrupted_incomplete_copy_is_cleaned_without_touching_original_or_unknown_files() -> Result<()>
+{
+    use sha2::{Digest, Sha256};
+    let t = tempfile::tempdir()?;
+    let j = job(t.path())?;
+    let root = t.path().join("output");
+    let state = t.path().join("state");
+    let dst = root.join("skipped").join(&j.relative);
+    fs::create_dir_all(dst.parent().unwrap())?;
+    let temporary = dst.parent().unwrap().join(".petal-registered.move-copy");
+    let unknown = dst.parent().unwrap().join(".petal-unknown.move-copy");
+    fs::write(&temporary, b"incomplete copy")?;
+    fs::write(&unknown, b"not ours")?;
+    let key = format!("{:x}", Sha256::digest(root.to_string_lossy().as_bytes()));
+    let source_key = files::fingerprint(&j.source)?;
+    files::atomic_json(
+        &state.join(format!("native-moves-{}.json", &key[..24])),
+        &serde_json::json!({j.source.to_string_lossy().to_string(): {
+            "source":j.source,"destination":dst,
+            "hold":j.source.parent().unwrap().join(".petal-test.move-source"),
+            "temporary":temporary,"original":files::identity(&j.source.metadata()?),
+            "sha":"","phase":"prepared","same_device":false
+        }}),
+    )?;
+    files::Mover::new(&root, &state)?.recover(&Control::default())?;
+    assert!(!temporary.exists());
+    assert_eq!(fs::read(unknown)?, b"not ours");
+    assert_eq!(files::fingerprint(&j.source)?, source_key);
+    assert_eq!(fs::read(&j.source)?, vec![17_u8; 100000]);
+    assert!(!dst.exists());
+    Ok(())
+}
