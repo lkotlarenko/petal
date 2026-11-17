@@ -3,6 +3,9 @@ set -euo pipefail
 output=$1
 mkdir -p "$output"
 cp LICENSE THIRD_PARTY.md "$output/"
+# Notices cover the entire lockfile, including crates not compiled on this host.
+# A fresh Linux CI cache does not contain their source/license files yet.
+cargo fetch --locked
 cargo metadata --format-version 1 --locked --offline > "$output/dependencies.json"
 jq -r '.packages[] | select(.source != null) | [.name,.version,.manifest_path,.license] | @tsv' "$output/dependencies.json" |
 while IFS=$'\t' read -r name version manifest license; do
